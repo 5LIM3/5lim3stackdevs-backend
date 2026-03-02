@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>5LIM3STACKDEVS — Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #030000; --bg2: #080000; --surface: #100000; --surface2: #180000;
+      --border: #2a0000; --border2: #4a0000;
+      --red: #ff1a1a; --red2: #cc0000; --red3: #880000;
+      --white: #f5e8e8; --muted: #6a3333; --text: #c8a8a8;
+      --green: #00cc66; --yellow: #ffaa00;
+      --glow: 0 0 20px rgba(255,26,26,0.4);
+      --glow-sm: 0 0 10px rgba(255,26,26,0.25);
+    }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    body { background:var(--bg); color:var(--text); font-family:'Rajdhani',sans-serif; min-height:100vh; }
+
+    /* LOGIN */
+    #login-screen {
+      min-height:100vh; display:flex; align-items:center; justify-content:center;
+      background: radial-gradient(ellipse at center, #0f0000 0%, #030000 70%);
+    }
+    .login-box {
+      background:var(--surface); border:1px solid var(--border2);
+      padding:48px 40px; width:360px;
+      clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+    }
+    .login-logo {
+      font-family:'Orbitron',monospace; font-size:1rem; font-weight:900;
+      color:var(--red); text-shadow:var(--glow); letter-spacing:2px;
+      margin-bottom:6px;
+    }
+    .login-sub { font-family:'Share Tech Mono',monospace; font-size:0.65rem; letter-spacing:3px; color:var(--muted); margin-bottom:32px; }
+    .login-label { font-family:'Share Tech Mono',monospace; font-size:0.6rem; letter-spacing:3px; color:var(--muted); text-transform:uppercase; display:block; margin-bottom:6px; }
+    .login-input {
+      width:100%; background:var(--bg2); border:1px solid var(--border);
+      padding:12px 16px; color:var(--white); font-family:'Rajdhani',sans-serif;
+      font-size:1rem; outline:none; margin-bottom:20px;
+      transition:border-color 0.3s, box-shadow 0.3s;
+    }
+    .login-input:focus { border-color:var(--red); box-shadow:var(--glow-sm); }
+    .login-btn {
+      width:100%; padding:14px; background:var(--red); color:#000;
+      font-family:'Share Tech Mono',monospace; font-size:0.75rem; letter-spacing:2px;
+      text-transform:uppercase; border:none; cursor:pointer; font-weight:700;
+      transition:all 0.3s;
+      clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+    }
+    .login-btn:hover { box-shadow:var(--glow); }
+    .login-error { color:var(--red); font-size:0.85rem; margin-top:12px; min-height:20px; }
+
+    /* DASHBOARD */
+    #dashboard { display:none; }
+    .dash-nav {
+      background:var(--bg2); border-bottom:1px solid var(--border2);
+      padding:0 32px; height:60px;
+      display:flex; align-items:center; justify-content:space-between;
+      position:sticky; top:0; z-index:100;
+    }
+    .dash-logo { font-family:'Orbitron',monospace; font-size:0.9rem; font-weight:900; color:var(--red); letter-spacing:2px; }
+    .dash-nav-right { display:flex; align-items:center; gap:20px; }
+    .dash-status { font-family:'Share Tech Mono',monospace; font-size:0.62rem; letter-spacing:2px; color:var(--green); }
+    .dash-status::before { content:'● '; }
+    .logout-btn {
+      font-family:'Share Tech Mono',monospace; font-size:0.62rem; letter-spacing:2px;
+      padding:8px 18px; border:1px solid var(--border2); color:var(--muted);
+      background:transparent; cursor:pointer; text-transform:uppercase;
+      transition:all 0.3s;
+    }
+    .logout-btn:hover { border-color:var(--red); color:var(--red); }
+
+    .dash-content { padding:32px; max-width:1200px; margin:0 auto; }
+
+    /* STATS */
+    .stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:32px; }
+    .stat-card {
+      background:var(--surface); border:1px solid var(--border);
+      padding:24px; border-left:3px solid var(--red);
+    }
+    .stat-card-num { font-family:'Orbitron',monospace; font-size:2rem; font-weight:900; color:var(--red); }
+    .stat-card-label { font-family:'Share Tech Mono',monospace; font-size:0.6rem; letter-spacing:3px; color:var(--muted); text-transform:uppercase; margin-top:4px; }
+    .stat-card.green { border-left-color:var(--green); }
+    .stat-card.green .stat-card-num { color:var(--green); }
+    .stat-card.yellow { border-left-color:var(--yellow); }
+    .stat-card.yellow .stat-card-num { color:var(--yellow); }
+
+    /* MESSAGES */
+    .section-header {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:20px;
+    }
+    .section-title { font-family:'Orbitron',monospace; font-size:1rem; font-weight:700; color:var(--white); }
+    .filter-tabs { display:flex; gap:8px; }
+    .filter-tab {
+      font-family:'Share Tech Mono',monospace; font-size:0.6rem; letter-spacing:2px;
+      padding:6px 14px; border:1px solid var(--border); color:var(--muted);
+      background:transparent; cursor:pointer; text-transform:uppercase; transition:all 0.3s;
+    }
+    .filter-tab.active, .filter-tab:hover { border-color:var(--red); color:var(--red); }
+
+    #messages-list { display:flex; flex-direction:column; gap:12px; }
+    .msg-card {
+      background:var(--surface); border:1px solid var(--border);
+      padding:20px 24px; cursor:pointer;
+      transition:border-color 0.3s, transform 0.2s;
+      position:relative;
+    }
+    .msg-card:hover { border-color:var(--border2); transform:translateX(4px); }
+    .msg-card.unread { border-left:3px solid var(--red); }
+    .msg-card.read { border-left:3px solid var(--border2); }
+    .msg-card.archived { opacity:0.5; }
+    .msg-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+    .msg-name { font-size:1rem; font-weight:700; color:var(--white); }
+    .msg-email { font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--muted); }
+    .msg-meta { display:flex; align-items:center; gap:16px; }
+    .msg-time { font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:var(--muted); }
+    .msg-budget { font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--red); font-weight:700; }
+    .msg-subject { font-size:0.9rem; color:var(--text); margin-bottom:6px; }
+    .msg-preview { font-size:0.85rem; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:500px; }
+    .msg-badge {
+      font-family:'Share Tech Mono',monospace; font-size:0.55rem; letter-spacing:2px;
+      padding:3px 8px; text-transform:uppercase;
+    }
+    .badge-unread { background:rgba(255,26,26,0.15); color:var(--red); border:1px solid var(--red3); }
+    .badge-read { background:transparent; color:var(--muted); border:1px solid var(--border); }
+    .badge-archived { background:transparent; color:var(--muted); border:1px solid var(--border); }
+
+    /* MESSAGE MODAL */
+    #msg-modal {
+      display:none; position:fixed; inset:0;
+      background:rgba(0,0,0,0.85); z-index:999;
+      align-items:center; justify-content:center; padding:20px;
+    }
+    #msg-modal.open { display:flex; }
+    .modal-box {
+      background:var(--surface); border:1px solid var(--border2);
+      width:100%; max-width:620px; max-height:85vh; overflow-y:auto;
+      clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 24px 100%, 0 calc(100% - 24px));
+    }
+    .modal-header {
+      padding:24px 28px; border-bottom:1px solid var(--border);
+      display:flex; justify-content:space-between; align-items:flex-start;
+    }
+    .modal-name { font-family:'Orbitron',monospace; font-size:1rem; font-weight:700; color:var(--white); }
+    .modal-email { font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--muted); margin-top:4px; }
+    .modal-close {
+      font-size:1.2rem; color:var(--muted); cursor:pointer; background:none; border:none;
+      transition:color 0.3s; line-height:1;
+    }
+    .modal-close:hover { color:var(--red); }
+    .modal-body { padding:24px 28px; }
+    .modal-meta-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px; }
+    .modal-meta-item { background:var(--bg2); border:1px solid var(--border); padding:12px 16px; }
+    .modal-meta-label { font-family:'Share Tech Mono',monospace; font-size:0.55rem; letter-spacing:3px; color:var(--muted); text-transform:uppercase; display:block; margin-bottom:4px; }
+    .modal-meta-value { font-size:0.9rem; color:var(--white); }
+    .modal-message-label { font-family:'Share Tech Mono',monospace; font-size:0.6rem; letter-spacing:3px; color:var(--muted); text-transform:uppercase; margin-bottom:10px; }
+    .modal-message { font-size:0.95rem; line-height:1.8; color:var(--text); white-space:pre-wrap; }
+    .modal-actions { display:flex; gap:10px; margin-top:24px; flex-wrap:wrap; }
+    .modal-btn {
+      font-family:'Share Tech Mono',monospace; font-size:0.65rem; letter-spacing:2px;
+      padding:10px 20px; border:1px solid var(--border2); color:var(--text);
+      background:transparent; cursor:pointer; text-transform:uppercase; transition:all 0.3s;
+    }
+    .modal-btn:hover { border-color:var(--red); color:var(--red); }
+    .modal-btn.primary { background:var(--red); color:#000; border-color:var(--red); font-weight:700; }
+    .modal-btn.primary:hover { box-shadow:var(--glow); }
+
+    .empty-state { text-align:center; padding:60px 20px; }
+    .empty-state-icon { font-size:3rem; margin-bottom:16px; }
+    .empty-state-text { font-family:'Share Tech Mono',monospace; font-size:0.7rem; letter-spacing:3px; color:var(--muted); }
+
+    .loading { text-align:center; padding:40px; font-family:'Share Tech Mono',monospace; font-size:0.7rem; letter-spacing:3px; color:var(--muted); }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN -->
+  <div id="login-screen">
+    <div class="login-box">
+      <div class="login-logo">5LIM3STACKDEVS</div>
+      <div class="login-sub">ADMIN DASHBOARD</div>
+      <label class="login-label">Password</label>
+      <input type="password" class="login-input" id="login-password" placeholder="Enter admin password" onkeydown="if(event.key==='Enter') login()"/>
+      <button class="login-btn" onclick="login()">ACCESS DASHBOARD →</button>
+      <div class="login-error" id="login-error"></div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard">
+    <nav class="dash-nav">
+      <div class="dash-logo">5LIM3 ADMIN</div>
+      <div class="dash-nav-right">
+        <span class="dash-status">SYSTEM ONLINE</span>
+        <button class="logout-btn" onclick="logout()">LOGOUT</button>
+      </div>
+    </nav>
+    <div class="dash-content">
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-card-num" id="stat-total">—</div>
+          <div class="stat-card-label">Total Messages</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-card-num" id="stat-unread">—</div>
+          <div class="stat-card-label">Unread</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-card-num" id="stat-read">—</div>
+          <div class="stat-card-label">Read</div>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div class="section-header">
+        <div class="section-title">INBOX</div>
+        <div class="filter-tabs">
+          <button class="filter-tab active" onclick="filterMessages('all', this)">ALL</button>
+          <button class="filter-tab" onclick="filterMessages('unread', this)">UNREAD</button>
+          <button class="filter-tab" onclick="filterMessages('read', this)">READ</button>
+          <button class="filter-tab" onclick="filterMessages('archived', this)">ARCHIVED</button>
+        </div>
+      </div>
+      <div id="messages-list"><div class="loading">LOADING MESSAGES...</div></div>
+    </div>
+  </div>
+
+  <!-- MESSAGE MODAL -->
+  <div id="msg-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div>
+          <div class="modal-name" id="modal-name"></div>
+          <div class="modal-email" id="modal-email"></div>
+        </div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-meta-row">
+          <div class="modal-meta-item">
+            <span class="modal-meta-label">Subject</span>
+            <span class="modal-meta-value" id="modal-subject"></span>
+          </div>
+          <div class="modal-meta-item">
+            <span class="modal-meta-label">Budget</span>
+            <span class="modal-meta-value" style="color:var(--red);" id="modal-budget"></span>
+          </div>
+          <div class="modal-meta-item">
+            <span class="modal-meta-label">Received</span>
+            <span class="modal-meta-value" id="modal-time"></span>
+          </div>
+          <div class="modal-meta-item">
+            <span class="modal-meta-label">Status</span>
+            <span class="modal-meta-value" id="modal-status"></span>
+          </div>
+        </div>
+        <div class="modal-message-label">MESSAGE</div>
+        <div class="modal-message" id="modal-message"></div>
+        <div class="modal-actions">
+          <a class="modal-btn primary" id="modal-reply" href="#" target="_blank">REPLY VIA EMAIL →</a>
+          <button class="modal-btn" id="modal-mark-read" onclick="markCurrentAs('read')">MARK AS READ</button>
+          <button class="modal-btn" id="modal-archive" onclick="markCurrentAs('archived')">ARCHIVE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let token = localStorage.getItem('admin_token') || null;
+    let allMessages = [];
+    let currentFilter = 'all';
+    let currentMsgId = null;
+
+    const API = ''; // Same origin
+
+    async function login() {
+      const pw = document.getElementById('login-password').value;
+      const err = document.getElementById('login-error');
+      if (!pw) { err.textContent = 'Enter your password.'; return; }
+      try {
+        const res = await fetch(`${API}/api/admin/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: pw })
+        });
+        const data = await res.json();
+        if (data.success) {
+          token = data.token;
+          localStorage.setItem('admin_token', token);
+          showDashboard();
+        } else {
+          err.textContent = data.error || 'Invalid password.';
+        }
+      } catch(e) {
+        err.textContent = 'Connection error. Is the server running?';
+      }
+    }
+
+    async function logout() {
+      try {
+        await fetch(`${API}/api/admin/logout`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+      } catch(e) {}
+      token = null;
+      localStorage.removeItem('admin_token');
+      document.getElementById('dashboard').style.display = 'none';
+      document.getElementById('login-screen').style.display = 'flex';
+      document.getElementById('login-password').value = '';
+    }
+
+    async function showDashboard() {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      await loadMessages();
+    }
+
+    async function loadMessages() {
+      try {
+        const res = await fetch(`${API}/api/admin/messages`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.status === 401) { logout(); return; }
+        const data = await res.json();
+        allMessages = data.messages;
+        document.getElementById('stat-total').textContent = data.stats.total;
+        document.getElementById('stat-unread').textContent = data.stats.unread;
+        document.getElementById('stat-read').textContent = data.stats.read;
+        renderMessages();
+      } catch(e) {
+        document.getElementById('messages-list').innerHTML = '<div class="loading">Failed to load messages.</div>';
+      }
+    }
+
+    function renderMessages() {
+      const list = document.getElementById('messages-list');
+      let filtered = allMessages;
+      if (currentFilter !== 'all') filtered = allMessages.filter(m => m.status === currentFilter);
+      if (filtered.length === 0) {
+        list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">NO MESSAGES FOUND</div></div>`;
+        return;
+      }
+      list.innerHTML = filtered.map(m => `
+        <div class="msg-card ${m.status}" onclick="openMessage(${m.id})">
+          <div class="msg-header">
+            <div>
+              <div class="msg-name">${escHtml(m.name)}</div>
+              <div class="msg-email">${escHtml(m.email)}</div>
+            </div>
+            <div class="msg-meta">
+              ${m.budget && m.budget !== 'Not specified' ? `<span class="msg-budget">${escHtml(m.budget)}</span>` : ''}
+              <span class="msg-time">${formatTime(m.created_at)}</span>
+              <span class="msg-badge badge-${m.status}">${m.status}</span>
+            </div>
+          </div>
+          <div class="msg-subject">${escHtml(m.subject || '—')}</div>
+          <div class="msg-preview">${escHtml(m.message)}</div>
+        </div>
+      `).join('');
+    }
+
+    function openMessage(id) {
+      const m = allMessages.find(x => x.id === id);
+      if (!m) return;
+      currentMsgId = id;
+      document.getElementById('modal-name').textContent = m.name;
+      document.getElementById('modal-email').textContent = m.email;
+      document.getElementById('modal-subject').textContent = m.subject || '—';
+      document.getElementById('modal-budget').textContent = m.budget || 'Not specified';
+      document.getElementById('modal-time').textContent = formatTime(m.created_at);
+      document.getElementById('modal-status').textContent = m.status.toUpperCase();
+      document.getElementById('modal-message').textContent = m.message;
+      document.getElementById('modal-reply').href = `mailto:${m.email}?subject=Re: ${encodeURIComponent(m.subject || 'Your Inquiry')}`;
+      document.getElementById('msg-modal').classList.add('open');
+      if (m.status === 'unread') markCurrentAs('read', false);
+    }
+
+    function closeModal() {
+      document.getElementById('msg-modal').classList.remove('open');
+      currentMsgId = null;
+    }
+
+    async function markCurrentAs(status, reload = true) {
+      if (!currentMsgId) return;
+      try {
+        await fetch(`${API}/api/admin/messages/${currentMsgId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ status })
+        });
+        const msg = allMessages.find(m => m.id === currentMsgId);
+        if (msg) msg.status = status;
+        document.getElementById('modal-status').textContent = status.toUpperCase();
+        if (reload) { renderMessages(); loadMessages(); }
+        else renderMessages();
+      } catch(e) {}
+    }
+
+    function filterMessages(filter, btn) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      renderMessages();
+    }
+
+    function escHtml(str) {
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+    function formatTime(dt) {
+      return new Date(dt).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    }
+
+    // Close modal on backdrop click
+    document.getElementById('msg-modal').addEventListener('click', e => {
+      if (e.target === document.getElementById('msg-modal')) closeModal();
+    });
+
+    // Auto-login if token exists
+    if (token) showDashboard();
+  </script>
+</body>
+</html>
