@@ -81,7 +81,7 @@ window.addEventListener('scroll', () => {
 
 // ⚠️ UPDATE THIS URL after deploying your backend to Render
 // e.g. 'https://5lim3stackdevs-backend.onrender.com'
-const BACKEND_URL = 'https://YOUR-BACKEND.onrender.com';
+const BACKEND_URL = 'https://fivelim3stackdevs-backend.onrender.com';
 
 async function handleSubmit(btn) {
   const form = btn.closest('.contact-form') || document.querySelector('.contact-form');
