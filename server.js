@@ -54,6 +54,9 @@ function requireAuth(req, res, next) {
   });
 }
 
+// ── HEALTH CHECK ──
+app.get('/', (req, res) => res.status(200).json({ status: 'ok' }));
+
 app.post('/api/contact', contactLimiter, async (req, res) => {
   const { name, email, subject, budget, message } = req.body;
   const ip = req.ip || req.headers['x-forwarded-for'];
